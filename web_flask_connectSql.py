@@ -7,30 +7,46 @@ app = Flask(__name__)
 db = pymysql.connect(host='13.113.77.146', port=3306, user='root', passwd='123456', db='user', charset='utf8mb4')
 cursor = db.cursor()
 
-### 比對傳入的檔案內容，驗證是否成功登入
 @app.route('/', methods=['GET', 'POST'])
 def login():
+    return redirect(url_for('post_admin'))
+
+### 比對傳入的檔案內容，驗證是否成功登入
+@app.route('/post_admin', methods=['GET', 'POST'])
+def post_admin():
     if request.method == 'POST':
-        print("hello4")
+        # # 使用者帳號的值 = 查詢資料庫中，與使用者輸入的帳號的值，相同的使用者帳號的密碼
+        # if request.values['username'] == "select * from userdb where username = '" + request.values['username'] + "'" and request.values['password'] == "select * from userdb where password = '" + request.values['password'] + "'":
+        #     return "登入成功"
+        #     # return True
+        #
+        #     #return redirect(url_for('hello', username=request.form.get('username')))
+        # else:
+        cursor.execute("select * from userdb where username = '" + request.values['username'] + "'")
+        for row in cursor:
+            if request.values['username'] == row[0] and request.values['password'] == row[1] : # 帳號 # 密碼
+                return "登入成功"
+            else:
+            # a = "select * from userdb where username = 'fefe'"
+            #a = "select * from userdb where username = '" + request.values['username'] + "'"
+                return "登入失敗"
 
-        # if login_check(request.values['username'], request.values['password']):
-        #     flash('Login Success!')
-        #     return redirect(url_for('hello', username=request.form.get('username')))
-        if request.values['username'] == 'admin' and request.values['password'] == 'hello':
-            print("hello")
-            return "登入成功"
-            # return True
-            flash('Login Success!')
-            #return redirect(url_for('hello', username=request.form.get('username')))
-        else:
-            print("hello2")
-            return "登入失敗"
+    return redirect(url_for('post_content'))
 
-        a = request.values['content']
-        print("hello3")
+@app.route('/post_content', methods=['GET', 'POST'])
+def post_content():
+    if request.method == 'POST':
 
+        input = request.values['content']
+        print(input)
 
-    return render_template('login.html')
+        # # if request.form['content'] is None :
+        # #     a = request.values.get('content')
+        # #     return "Hello" + a
+        # return render_template('0302.html', user_content=user_content)
+        return render_template('0302.html', user_content=input)
+
+    return render_template('0302.html')
 
 # ### 把從前端接到的參數，傳進mysql
 # @app.route('/', methods=['GET', 'POST'])
